@@ -1,0 +1,7 @@
+; $Id$
+name = BULATS Boxes
+description = Provides a mulitlanguage Boxes plugin for the ESOL BULATS site.
+package = BULATS
+core = 7.x
+dependencies[] = boxes
+dependencies[] = ctools
