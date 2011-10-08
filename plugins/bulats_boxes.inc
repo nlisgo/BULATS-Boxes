@@ -16,6 +16,18 @@ class boxes_bulats extends boxes_box {
         'value' => '',
         'format' => filter_default_format(),
       ),
+      'french' => array(
+        'value' => '',
+        'format' => filter_default_format(),
+      ),
+      'spanish' => array(
+        'value' => '',
+        'format' => filter_default_format(),
+      ),
+      'german' => array(
+        'value' => '',
+        'format' => filter_default_format(),
+      ),
     );
   }
 
@@ -57,7 +69,7 @@ class boxes_bulats extends boxes_box {
 	  $form['german'] = array(
         '#type' => 'text_format',
         '#base_type' => 'textarea',
-        '#title' => t('English Body Text'),
+        '#title' => t('German Body Text'),
         '#default_value' => $this->options['german']['value'],
         '#rows' => 6,
         '#format' => $this->options['german']['format'] ? $this->options['german']['format'] : NULL,
