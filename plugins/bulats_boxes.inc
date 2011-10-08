@@ -1,13 +1,15 @@
 <?php
 
 /**
- * Custom Bulats Multi-language Box
+ * Simple custom text box.
  */
 class boxes_bulats extends boxes_box {
-	
   /**
    * Implementation of boxes_box::options_defaults().
    */
+   
+  public $plugin;
+   
   public function options_defaults() {
     return array(
       'body' => array(
@@ -21,18 +23,18 @@ class boxes_bulats extends boxes_box {
    * Implementation of boxes_box::options_form().
    */
   public function options_form(&$form_state) {
-    $format = filter_format_load($this->options['english']['format']);
+    $format = filter_format_load($this->options['body']['format']);
 
     if (filter_access($format)) {
       $form = array();
-      $form['english'] = array(
+      $form['body'] = array(
         '#type' => 'text_format',
         '#base_type' => 'textarea',
-        '#title' => t('English Body Text'),
-        '#default_value' => $this->options['english']['value'],
+        '#title' => t('English body'),
+        '#default_value' => $this->options['body']['value'],
         '#rows' => 6,
-        '#format' => $this->options['english']['format'] ? $this->options['english']['format'] : NULL,
-        '#description' => t('The English Version.'),
+        '#format' => $this->options['body']['format'] ? $this->options['body']['format'] : NULL,
+        '#description' => t('The content of the block as shown to the user.'),
       );
 	  $form['french'] = array(
         '#type' => 'text_format',
@@ -70,20 +72,9 @@ class boxes_bulats extends boxes_box {
    */
   public function render() {
     $content = '';
-    if (!empty($this->options['english']['value'])) {
-       if (isset($this->options['french']['format']) && !$this->options['french']['format'] && $language = 'fr') {
-         $content = check_markup($this->options['french']['value'], $this->options['french']['format'], $langcode = '' /* TODO Set this variable. */, FALSE);
-       }
-	   elseif (isset($this->options['spanish']['format']) && !$this->options['spanish']['format'] && $language = 'es') {
-         $content = check_markup($this->options['spanish']['value'], $this->options['spanish']['format'], $langcode = '' /* TODO Set this variable. */, FALSE);
-       }
-	   elseif (isset($this->options['german']['format']) && !$this->options['german']['format'] && $language = 'de') {
-         $content = check_markup($this->options['german']['value'], $this->options['german']['format'], $langcode = '' /* TODO Set this variable. */, FALSE);
-       }
-	   if (isset($this->options['english']['format']) && !$this->options['english']['format']) {
-         $content = check_markup($this->options['english']['value'], $this->options['english']['format'], $langcode = '' /* TODO Set this variable. */, FALSE);
-       }
-     }
+    if (!empty($this->options['body']['value']) && isset($this->options['body']['format'])) {
+      $content = check_markup($this->options['body']['value'], $this->options['body']['format'], $langcode = '' /* TODO Set this variable. */, FALSE);
+    }
     $title = isset($this->title) ? $this->title : NULL;
     return array(
       'delta' => $this->delta, // Crucial.

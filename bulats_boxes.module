@@ -15,16 +15,9 @@ function bulats_boxes_ctools_plugin_api($module, $api) {
  */
 function bulats_boxes_boxes_plugins() {
   $info = array();
-  $path = drupal_get_path('module', 'boxes') . '/plugins';
-  $info['box'] = array(
-    'handler' => array(
-      'class' => 'boxes_box',
-      'file' => 'boxes_box.inc',
-      'path' => drupal_get_path('module', 'boxes') . '/plugins',
-    ),
-  );
+  $path = drupal_get_path('module', 'bulats_boxes') . '/plugins';
   $info['bulats'] = array(
-    'title' => 'Bulats Box',
+    'title' => 'BULATS',
     'handler' => array(
       'parent' => 'box',
       'class' => 'boxes_bulats',
