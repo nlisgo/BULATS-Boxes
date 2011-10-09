@@ -3,7 +3,7 @@
 /**
  * Simple custom text box.
  */
-class boxes_bulats extends boxes_box {  
+class boxes_bulats extends boxes_box {
   /**
    * Implementation of boxes_box::options_defaults().
    */
@@ -15,13 +15,15 @@ class boxes_bulats extends boxes_box {
    
   public function options_defaults() {
     $this->languages = $this->enabled_languages();
-    $this->language_default = language_default();
     
     $options = array();
     
     foreach ($this->languages as $lang)
     {
-      $options[$lang->language] = array(
+      $options[$lang->language.'_title'] = array(
+        'value' => '',
+      );
+      $options[$lang->language.'_body'] = array(
         'value' => '',
         'format' => filter_default_format(),
       );
@@ -34,6 +36,7 @@ class boxes_bulats extends boxes_box {
    * Get enabled languages
    */
   public function enabled_languages() {
+    $this->language_default = language_default();
     $query = db_select('languages', '')
       ->condition('languages.enabled', 1, '=')
       ->fields('languages', array('language', 'name', 'native', 'direction', 'prefix'));
@@ -44,6 +47,10 @@ class boxes_bulats extends boxes_box {
       $languages[$result->language] = $result;
     }
 
+    $language_default[$this->language_default->language] = $languages[$this->language_default->language];
+    unset($languages[$this->language_default->language]);
+    $languages = array_merge($language_default, $languages);
+
     return $languages;
   }
 
@@ -51,33 +58,32 @@ class boxes_bulats extends boxes_box {
    * Implementation of boxes_box::options_form().
    */
   public function options_form(&$form_state) {
-    $format = filter_format_load($this->options[$this->language_default->language]['format']);
+    $format = filter_format_load($this->options[$this->language_default->language.'_body']['format']);
 
     if (filter_access($format)) {
-      
       $form = array();
       $languages = $this->languages;
-      unset($languages[$this->language_default->language]);
-
-      $form[$this->language_default->language] = array(
-        '#type' => 'text_format',
-        '#base_type' => 'textarea',
-        '#title' => t($this->language_default->name.' body text'),
-        '#default_value' => $this->options[$this->language_default->language]['value'],
-        '#rows' => 6,
-        '#format' => $this->options[$this->language_default->language]['format'] ? $this->options[$this->language_default->language]['format'] : NULL,
-        '#description' => t('The content of the block as shown to the user.'),
-      );
-      
       
       foreach ($languages as $lang) {
         $form[$lang->language] = array(
+          '#type' => 'fieldset',
+          '#title' => t($lang->name),
+          '#collapsible' => TRUE,
+          '#collapsed' => FALSE,
+        );
+	      $form[$lang->language][$lang->language.'_title'] = array(
+          '#type' => 'textfield',
+          '#title' => t('BOX TITLE'),
+          '#default_value' => $this->options[$lang->language.'_title'],
+          '#description' => t('The title of the box as shown to the user.'),
+        );
+        $form[$lang->language][$lang->language.'_body'] = array(
           '#type' => 'text_format',
           '#base_type' => 'textarea',
-          '#title' => t($lang->name.' body text'),
-          '#default_value' => $this->options[$lang->language]['value'],
+          '#title' => t('BOX BODY'),
+          '#default_value' => $this->options[$lang->language.'_body']['value'],
           '#rows' => 6,
-          '#format' => $this->options[$lang->language]['format'] ? $this->options[$lang->language]['format'] : NULL,
+          '#format' => $this->options[$lang->language.'_body']['format'] ? $this->options[$lang->language.'_body']['format'] : NULL,
           '#description' => t('The content of the block as shown to the user.'),
         );
       }
@@ -89,11 +95,12 @@ class boxes_bulats extends boxes_box {
    * Implementation of boxes_box::render().
    */
   public function render() {
+    $title = NULL;
     $content = '';
-    if (!empty($this->options[$this->language_default->language]['value']) && isset($this->options[$this->language_default->language]['format'])) {
-      $content = check_markup($this->options[$this->language_default->language]['value'], $this->options[$this->language_default->language]['format'], $langcode = '' /* TODO Set this variable. */, FALSE);
+    if (!empty($this->options[$this->language_default->language.'_body']['value']) && isset($this->options[$this->language_default->language.'_body']['format'])) {
+      $title = isset($this->options[$this->language_default->language.'_title']) ? $this->options[$this->language_default->language.'_title'] : NULL;
+      $content = check_markup($this->options[$this->language_default->language.'_body']['value'], $this->options[$this->language_default->language.'_body']['format'], $this->language_default->language, FALSE);
     }
-    $title = isset($this->title) ? $this->title : NULL;
     return array(
       'delta' => $this->delta, // Crucial.
       'title' => $title,
@@ -102,3 +109,4 @@ class boxes_bulats extends boxes_box {
     );
   }
 }
+
